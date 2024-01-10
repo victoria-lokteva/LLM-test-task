@@ -12,8 +12,16 @@ class DataPreprocessor(object):
         train = pd.read_csv(self.train_path)
         test = pd.read_csv(self.test_path)
 
-        train = train.drop_duplicates()
-        test = test.drop_duplicates()
+        train = train.drop_duplicates('uid')
+
+        # idea: if the user initiates the first click, subsequent actions are a result of this initial click.
+        # therefore, leave uid with "fclick"-tag if there are duplicates
+        test['is_first_click'] = (test['tag'] == 'fclick')
+
+        test = (test
+                .sort_values(['uid', 'is_first_click'])
+                .drop_duplicates('uid', keep='last')
+                .drop(columns='is_first_click'))
 
         # fill nans for categorical features
         for col in ['osName', 'model', 'hardware']:
