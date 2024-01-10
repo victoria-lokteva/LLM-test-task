@@ -27,7 +27,7 @@ class DataPreprocessor(object):
 
         # fill nans for categorical features
         for col in ['osName', 'model', 'hardware']:
-            data.loc[train[col].isna(), col] = 'unknown'
+            data.loc[data[col].isna(), col] = 'unknown'
 
         # значения dma, которые встречаются менее 5 раз, объединим в одну категорию -1 ("другое")
         rare_dma = [dma for dma, count in data['mm_dma'].value_counts().items() if count < 5]
@@ -56,7 +56,7 @@ class DataPreprocessor(object):
 
         data['month'] = data['reg_time'].dt.month
         data['hour'] = data['reg_time'].dt.hour
-        data['day'] = pd.to_datetime(data['reg_time']).dt.day_name()
+        data['week_day'] = pd.to_datetime(data['reg_time']).dt.day_name()
         return data
 
     @staticmethod
