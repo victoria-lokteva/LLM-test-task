@@ -1,0 +1,5 @@
+data_paths:
+  x_data: "data/interview.X.csv"
+  y_data: "data/interview.y.csv"
+  train: "data/train.feather"
+  validation: "data/validation.feather"

@@ -1,16 +1,18 @@
+import numpy as np
 import pandas as pd
+from config.config import Config
 
 
 class DataPreprocessor(object):
 
     def __init__(self):
-        self.train_path = "data/interview.X.csv"
-        self.test_path = "data/interview.y.csv"
+        self.x_data = Config().data_paths['x_data']
+        self.y_data = Config().data_paths['y_data']
 
     def preprocessing(self) -> pd.DataFrame:
         """"""
-        train = pd.read_csv(self.train_path)
-        test = pd.read_csv(self.test_path)
+        train = pd.read_csv(self.x_data)
+        test = pd.read_csv(self.y_data)
 
         train = train.drop_duplicates('uid')
 
@@ -33,7 +35,11 @@ class DataPreprocessor(object):
         rare_dma = [dma for dma, count in data['mm_dma'].value_counts().items() if count < 5]
         data.loc[data['mm_dma'].isin(rare_dma), 'mm_dma'] = -1
 
-        # Аналогично поступим с site_id, model
+        # union Windows users into one category, Symbian and Linux -> other
+        data['osName'] = np.where(data['osName'].isin({'Windows 10', 'Windows 7'}), 'Windows', data['osName'])
+        data['osName'] = np.where(data['osName'].isin({'Symbian', 'Linux'}), 'other', data['osName'])
+
+        # Аналогично поступим с site_id, model, and osName
         rare_site = [site for site, count in data['site_id'].value_counts().items() if count < 5]
         data.loc[data['site_id'].isin(rare_site), 'site_id'] = "other"
 
@@ -54,9 +60,14 @@ class DataPreprocessor(object):
         # convert strings into dates
         data['reg_time'] = pd.to_datetime(data['reg_time'], format='%Y-%m-%d %H:%M:%S')
 
+        data['year'] = data['reg_time'].dt.year
         data['month'] = data['reg_time'].dt.month
+
+        # similar with utmtr
         data['hour'] = data['reg_time'].dt.hour
         data['week_day'] = pd.to_datetime(data['reg_time']).dt.day_name()
+
+        data = data.drop(columns='reg_time')
         return data
 
     @staticmethod
