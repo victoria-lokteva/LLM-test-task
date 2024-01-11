@@ -3,3 +3,6 @@ data_paths:
   y_data: "data/interview.y.csv"
   train: "data/train.feather"
   validation: "data/validation.feather"
+model_paths:
+  lgbm: "saved_models/lgbm.pkl"
+  cb: "saved_models/cb.pkl"
