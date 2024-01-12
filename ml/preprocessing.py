@@ -31,9 +31,9 @@ class DataPreprocessor(object):
         for col in ['osName', 'model', 'hardware']:
             data.loc[data[col].isna(), col] = 'unknown'
 
-        # значения dma, которые встречаются менее 5 раз, объединим в одну категорию -1 ("другое")
+        # значения dma, которые встречаются менее 5 раз, объединим в одну категорию ("другое")
         rare_dma = [dma for dma, count in data['mm_dma'].value_counts().items() if count < 5]
-        data.loc[data['mm_dma'].isin(rare_dma), 'mm_dma'] = -1
+        data.loc[data['mm_dma'].isin(rare_dma), 'mm_dma'] = data['mm_dma'].max() + 1
 
         # union Windows users into one category, Symbian and Linux -> other
         data['osName'] = np.where(data['osName'].isin({'Windows 10', 'Windows 7'}), 'Windows', data['osName'])
@@ -80,7 +80,10 @@ class DataPreprocessor(object):
     @staticmethod
     def _website_name_preprocessing(data: pd.DataFrame) -> pd.DataFrame:
         """Extract information from website names.
-        Add categories such as sports and health based on keywords."""
+        Add categories such as sports and health based on keywords.
+
+        Just a demonstration of the idea. In the case of the actual task, it is necessary to understand
+        how to automate the classification (clustering) of site themes."""
 
         # remove www, www1
         data['site_id'] = data['site_id'].map(lambda x: x.replace("www1.", "").replace("www.", ""))
@@ -90,6 +93,7 @@ class DataPreprocessor(object):
 
         #
         data['is_sport_site'] = (data['site_id'].str.contains('sport')
+                                 | data['site_id'].str.contains('espn')
                                  | data['site_id'].str.contains('baseball')
                                  | data['site_id'].str.contains('football')
                                  | data['site_id'].str.contains('soccer')

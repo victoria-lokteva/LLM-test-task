@@ -140,7 +140,7 @@ class LightGBM(object):
             Check quality on validation set
         """
 
-        validation = pd.read_feather(self.test_path, columns=self.columns)
+        validation = pd.read_feather(self.validation_path, columns=self.columns)
 
         x = validation.loc[:, self.features]
         y = validation[self.target]
@@ -165,8 +165,8 @@ class LightGBM(object):
         train = pd.read_feather(self.train_path)
         x_train, y_train = train.loc[:, self.features], train[self.target]
 
-        test = pd.read_feather(self.test_path)
-        x_test, y_test = test.loc[:, self.features], test[self.target]
+        validation = pd.read_feather(self.validation_path)
+        x_val, y_val = validation.loc[:, self.features], validation[self.target]
 
         if self.is_regression:
             light_gbm = self.regression()
@@ -175,7 +175,7 @@ class LightGBM(object):
 
         light_gbm.fit(x_train, y_train,
                       categorical_feature=self.cat_features,
-                      eval_set=[(x_test, y_test)])
+                      eval_set=[(x_val, y_val)])
 
         feature_importance = (pd.DataFrame(zip(x_train.columns, light_gbm.feature_importances_),
                                            columns=['feature', 'gain'])
@@ -192,7 +192,7 @@ class LightGBM(object):
         """
 
         train_set = pd.read_feather(self.train_path, columns=self.columns)
-        test_set = pd.read_feather(self.test_path, columns=self.columns)
+        val_set = pd.read_feather(self.validation_path, columns=self.columns)
 
         if self.is_regression:
             light_gbm = self.regression()
@@ -202,11 +202,11 @@ class LightGBM(object):
         x_train = train_set.loc[:, self.features]
         y_train = train_set[self.target]
 
-        x_test = test_set.loc[:, self.features]
-        y_test = test_set[self.target]
+        x_val = val_set.loc[:, self.features]
+        y_val = val_set[self.target]
 
         light_gbm.fit(x_train, y_train,
                       categorical_feature=self.cat_features,
-                      eval_set=[(x_test, y_test)])
+                      eval_set=[(x_val, y_val)])
 
         joblib.dump(light_gbm, self.model_path)

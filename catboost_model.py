@@ -197,6 +197,12 @@ class CatBoost(object):
                           label=y,
                           cat_features=self.cat_features)
 
+        print(cv(cv_dataset,
+                 self.params(),
+                 fold_count=self.fold_count,
+                 shuffle=True,
+                 seed=self.seed))
+
         return cv(cv_dataset,
                   self.params(),
                   fold_count=self.fold_count,
@@ -208,7 +214,7 @@ class CatBoost(object):
             Check the model quality on the validation set.
         """
 
-        validation = pd.read_feather(self.test_path)
+        validation = pd.read_feather(self.validation_path)
 
         x = validation.loc[:, self.features]
         y = validation[self.target]
@@ -223,7 +229,7 @@ class CatBoost(object):
         else:
             model = CatBoostClassifier()
             model.load_model(self.model_path)
-            y_hat = model.predict_proba(x)
+            y_hat = model.predict_proba(x)[:, 1]
 
             print('LogLoss: ', log_loss(y, y_hat))
             print('Accuracy: ', accuracy_score(y, y_hat.round()))
@@ -233,7 +239,7 @@ class CatBoost(object):
     def save_model(self):
         """"""
         train_set = pd.read_feather(self.train_path)
-        validation_set = pd.read_feather(self.test_path)
+        validation_set = pd.read_feather(self.validation_path)
 
         x_train, y_train = train_set.loc[:, self.features], train_set[self.target]
         x_val, y_val = validation_set.loc[:, self.features], validation_set[self.target]
