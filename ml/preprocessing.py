@@ -39,10 +39,7 @@ class DataPreprocessor(object):
         data['osName'] = np.where(data['osName'].isin({'Windows 10', 'Windows 7'}), 'Windows', data['osName'])
         data['osName'] = np.where(data['osName'].isin({'Symbian', 'Linux'}), 'other', data['osName'])
 
-        # Аналогично поступим с site_id, model, and osName
-        rare_site = [site for site, count in data['site_id'].value_counts().items() if count < 5]
-        data.loc[data['site_id'].isin(rare_site), 'site_id'] = "other"
-
+        # Аналогично поступим с model, and osName
         rare_model = [model for model, count in data['model'].value_counts().items() if count < 5]
         data.loc[data['model'].isin(rare_model), 'model'] = "other"
 
@@ -92,50 +89,54 @@ class DataPreprocessor(object):
         data['domain'] = data['site_id'].map(lambda x: x.split('.')[-1])
 
         #
-        data['is_sport_site'] = (data['site_id'].str.contains('sport')
-                                 | data['site_id'].str.contains('espn')
-                                 | data['site_id'].str.contains('baseball')
-                                 | data['site_id'].str.contains('football')
-                                 | data['site_id'].str.contains('soccer')
-                                 | data['site_id'].str.contains('basketball')
-                                 | data['site_id'].str.contains('hockey')
-                                 | data['site_id'].str.contains('moneyball')
-                                 | data['site_id'].str.contains('rotowire')
-                                 | data['site_id'].str.contains('mmafighting')
-                                 | data['site_id'].str.contains('mmamania')
-                                 | data['site_id'].str.contains('nbaanalysis')
-                                 | data['site_id'].str.contains('nba-trade-rumors')
-                                 | data['site_id'].str.contains('nfltraderumors')
-                                 | data['site_id'].str.contains('nfldraftdiamonds')
-                                 | data['site_id'].str.contains('detroitbadboys.com')  # ?
-                                 | data['site_id'].str.contains('volleyball'))
+        is_sport_site = (data['site_id'].str.contains('sport')
+                         | data['site_id'].str.contains('espn')
+                         | data['site_id'].str.contains('baseball')
+                         | data['site_id'].str.contains('football')
+                         | data['site_id'].str.contains('soccer')
+                         | data['site_id'].str.contains('basketball')
+                         | data['site_id'].str.contains('hockey')
+                         | data['site_id'].str.contains('moneyball')
+                         | data['site_id'].str.contains('rotowire')
+                         | data['site_id'].str.contains('mmafighting')
+                         | data['site_id'].str.contains('mmamania')
+                         | data['site_id'].str.contains('nbaanalysis')
+                         | data['site_id'].str.contains('nba-trade-rumors')
+                         | data['site_id'].str.contains('nfltraderumors')
+                         | data['site_id'].str.contains('nfldraftdiamonds')
+                         | data['site_id'].str.contains('detroitbadboys.com')  # ?
+                         | data['site_id'].str.contains('volleyball'))
 
-        data['is_travel_site'] = (data['site_id'].str.contains('travel')
-                                  | data['site_id'].str.contains('tourist'))
+        is_travel_site = (data['site_id'].str.contains('travel')
+                          | data['site_id'].str.contains('tourist'))
 
-        data['is_weather_site'] = (data['site_id'].str.contains('weather'))
+        is_weather_site = (data['site_id'].str.contains('weather'))
 
-        data['is_game_site'] = (data['site_id'].str.contains('game'))
+        is_game_site = (data['site_id'].str.contains('game'))
 
-        data['is_music_site'] = (data['site_id'].str.contains('music')
-                                 | data['site_id'].str.contains('hip-hop')
-                                 | data['site_id'].str.contains('song')  # ?
-                                 | data['site_id'].str.contains('guitar'))
+        is_music_site = (data['site_id'].str.contains('music')
+                         | data['site_id'].str.contains('hip-hop')
+                         | data['site_id'].str.contains('song')  # ?
+                         | data['site_id'].str.contains('guitar'))
 
-        data['is_cook_site'] = (data['site_id'].str.contains('cook')
-                                | data['site_id'].str.contains('diet')
-                                | data['site_id'].str.contains('fastfood')
-                                | data['site_id'].str.contains('cupcake')  # javacupcake.com
-                                | data['site_id'].str.contains('grandbaby-cakes')
-                                | data['site_id'].str.contains('browneyedbaker')  # baker?
-                                | data['site_id'].str.contains('baking')
-                                | data['site_id'].str.contains('lovebakesgoodcakes')
-                                | data['site_id'].str.contains('bakery'))
+        is_cook_site = (data['site_id'].str.contains('cook')
+                        | data['site_id'].str.contains('diet')
+                        | data['site_id'].str.contains('fastfood')
+                        | data['site_id'].str.contains('cupcake')  # javacupcake.com
+                        | data['site_id'].str.contains('grandbaby-cakes')
+                        | data['site_id'].str.contains('browneyedbaker')  # baker?
+                        | data['site_id'].str.contains('baking')
+                        | data['site_id'].str.contains('lovebakesgoodcakes')
+                        | data['site_id'].str.contains('bakery'))
 
-        data['is_health_site'] = (data['site_id'].str.contains('health')
-                                  | data['site_id'].str.contains('medical'))
+        is_health_site = (data['site_id'].str.contains('health')
+                          | data['site_id'].str.contains('medical'))
 
-        data['is_zodiac_site'] = (data['site_id'].str.contains('astrology')
-                                  | data['site_id'].str.contains('zodiac'))
+        masks = [is_sport_site, is_travel_site, is_weather_site, is_game_site, is_music_site, is_cook_site,
+                 is_health_site]
+
+        values = ['sport', 'travel', 'weather', 'game', 'music', 'cooking', 'health']
+
+        data['site_category'] = np.select(masks, values, default='other')
 
         return data

@@ -12,9 +12,9 @@ class ClickLGBM(LightGBM):
     def __init__(self):
         super().__init__(is_regression=False,
                          target='click', objective='binary', metric='binary', cv_metric='valid binary_logloss-mean',
-                         n_estimators=5000, learning_rate=0.011217,
-                         num_leaves=20, feature_fraction=0.45, lambda_l1=1.26258, lambda_l2=9.50238,
-                         bagging_fraction=0.844, bagging_freq=8, min_data_in_leaf=20, early_stopping_round=100,
+                         n_estimators=5000, learning_rate=0.00873,
+                         num_leaves=17, feature_fraction=0.646, lambda_l1=0.79814, lambda_l2=6.42049,
+                         bagging_fraction=0.847, bagging_freq=2, min_data_in_leaf=20, early_stopping_round=100,
                          cv=5)
 
         self.features = ['fc_imp_chk',
@@ -25,24 +25,14 @@ class ClickLGBM(LightGBM):
                          'model',
                          'hardware',
                          'domain',
-                         'is_sport_site',
-                         'is_travel_site',
-                         'is_weather_site',
-                         'is_game_site',
-                         'is_music_site',
-                         'is_cook_site',
-                         'is_health_site',
-                         'is_zodiac_site',
+                         'site_category',
                          'year',
                          'month',
                          'hour',
                          'week_day'
                          ]
 
-        # potential data leak here: there's a wrong assumption that the strengths of the leagues remain stable over time.
-        # on the one hand, we want to take into account information about opponents' leagues.
-        # on the other hand, we're looking into the future when using this information.
-        self.cat_features = ['mm_dma', 'osName', 'model', 'hardware', 'domain', 'week_day']
+        self.cat_features = ['mm_dma', 'osName', 'model', 'hardware', 'domain', 'week_day', 'site_category']
         self.columns = self.features + [self.target]
 
         self.train_path = Config().data_paths['train']
@@ -70,7 +60,7 @@ class ClickLGBM(LightGBM):
                 'verbose': -1,
 
                 'early_stopping_round': self.early_stopping_round,
-                'learning_rate': trial.suggest_float('learning_rate', 0.005, 0.03, step=0.000001),
+                'learning_rate': trial.suggest_float('learning_rate', 0.005, 0.02, step=0.000001),
 
                 'feature_fraction': trial.suggest_float('feature_fraction', 0.45, 0.75, step=fraction_step),
                 'num_leaves': trial.suggest_int('num_leaves', 10, 30),

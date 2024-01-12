@@ -18,7 +18,7 @@ class TrainCreator(object):
         data = data.drop(columns=['tag', 'site_id'])
 
         # categorical features
-        cat_features = ['osName', 'model', 'hardware', 'domain', 'week_day']
+        cat_features = ['osName', 'model', 'hardware', 'domain', 'week_day', 'site_category']
         data[cat_features] = data[cat_features].astype('category')
 
         train, validation = train_test_split(data, test_size=self.test_size, random_state=self.random_state,
