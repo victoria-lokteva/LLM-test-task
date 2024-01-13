@@ -1,9 +1,31 @@
 
+data_description = """
+Dataset contains log of impressions
+########
+Input data  description
+
+reg_time - timestamp;
+uid - id of impression;
+fc_imp_chk - the number of previous impressions;
+fc_time_chk - time since the last impression;
+utmtr - time of impression in a user's timezone;
+column mm_dma - Designated Market Area;
+column osName - operating system;
+column model - device model;
+column <hardware> - device type;
+column <site_id> - site w here impression happened;
+tag - impression type
+########
+
+We consider as click only impression with tag == 'fclick'
+"""
+
+
 preprocess = """"""
 
 """provide step by step solution"""
 
-template = f"""Answer the question based only on the following context:
+with_context = """Answer the question based only on the following context:
 {context}
 
 Question: {question}
