@@ -1,6 +1,7 @@
 import pandas as pd
 from catboost import CatBoostRegressor, CatBoostClassifier, Pool, cv
 from sklearn.metrics import mean_squared_error, mean_absolute_error, log_loss, accuracy_score
+import shap
 
 
 class CatBoost(object):
@@ -273,3 +274,29 @@ class CatBoost(object):
         data[prediction_name] = model.predict(data.loc[:, self.features])
 
         return data
+
+    def feature_importance(self):
+        """"""
+        train_set = pd.read_feather(self.train_path)
+        validation_set = pd.read_feather(self.validation_path)
+
+        x_train, y_train = train_set.loc[:, self.features], train_set[self.target]
+        x_val, y_val = validation_set.loc[:, self.features], validation_set[self.target]
+
+        # unfitted model
+        if self.is_regression:
+            model = self.regressor()
+        else:
+            model = self.classifier()
+
+        model.fit(x_train, y_train,
+                  cat_features=self.cat_features,
+                  early_stopping_rounds=self.od_wait,
+                  eval_set=(x_val, y_val),
+                  verbose=False)
+
+        explainer = shap.TreeExplainer(model)
+        shap_values = explainer(x_train)
+
+        shap.summary_plot(shap_values, x_train)
+

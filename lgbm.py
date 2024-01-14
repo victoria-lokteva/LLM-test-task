@@ -158,7 +158,7 @@ class LightGBM(object):
 
         return validation
 
-    def feature_importance(self) -> pd.DataFrame:
+    def feature_importance(self, is_shap=True) -> pd.DataFrame:
         """
         """
 
@@ -176,13 +176,22 @@ class LightGBM(object):
         light_gbm.fit(x_train, y_train,
                       categorical_feature=self.cat_features,
                       eval_set=[(x_val, y_val)])
+        if is_shap:
+            import shap
 
-        feature_importance = (pd.DataFrame(zip(x_train.columns, light_gbm.feature_importances_),
-                                           columns=['feature', 'gain'])
-                              .sort_values(['gain'], ascending=False)
-                              .reset_index(drop=True))
+            explainer = shap.TreeExplainer(light_gbm)
 
-        feature_importance['gain'] = round(100 * feature_importance['gain'] / sum(feature_importance['gain']), 3)
+            shap_values = explainer.shap_values(x_train)
+
+            feature_importance = shap.summary_plot(shap_values, x_train)
+
+        else:
+            feature_importance = (pd.DataFrame(zip(x_train.columns, light_gbm.feature_importances_),
+                                               columns=['feature', 'gain'])
+                                  .sort_values(['gain'], ascending=False)
+                                  .reset_index(drop=True))
+
+            feature_importance['gain'] = round(100 * feature_importance['gain'] / sum(feature_importance['gain']), 3)
 
         return feature_importance
 
