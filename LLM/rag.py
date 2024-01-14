@@ -2,11 +2,9 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-# from templates import data_description
+from templates import data_description
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain import HuggingFacePipeline
 from langchain_community.document_loaders import CSVLoader
 from langchain_community.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
@@ -25,6 +23,7 @@ def rag_pipeline(
         template: str,
         data_description_template: str = None,
         csv_file_path: str = None,
+        llm_path: str = "/Users/victorialokteva/LLMtesttask/models/mistral.gguf"
 ):
     if csv_file_path is None:
         csv_file_path = "/Users/victorialokteva/LLMtesttask/data/dataset.csv"
@@ -54,14 +53,10 @@ def rag_pipeline(
         template = data_description_template + template
     QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
 
-    model = GPT4All(model="/Users/victorialokteva/LLMtesttask/models/mistral.gguf", n_threads=8)
-    tokenizer = AutoTokenizer.from_pretrained("/Users/victorialokteva/LLMtesttask/models/mistral.gguf")
-    pipe = pipeline("text2text-generation", model=model, tokenizer=tokenizer)
-    # поставим temperature = 0, чтобы меньше искажать факты
-    llm = HuggingFacePipeline(
-        pipeline=pipe,
-        model_kwargs={"temperature": 0,
-                      "max_length": 512},
+
+    llm = GPT4All(
+        model=llm_path,
+        backend="llama",
     )
 
     qa_chain = RetrievalQA.from_chain_type(
@@ -81,13 +76,11 @@ def result_to_file(data, filename):
 
 
 if __name__ == "__main__":
-    # result = rag_pipeline(question,
-    #                       template,
-    #                       data_description)
     result = rag_pipeline(question,
-                          template
-                          )
+                          template,
+                          data_description)
 
-    output_file = f"../generated_code/{question[:14].txt}"
+
+    output_file = f"../generated_code/{question[:20]}.txt"
 
     result_to_file(result["result"], output_file)

@@ -25,6 +25,8 @@ mv models/mistral-7b-openorca.Q4_0.gguf models/mistral.gguf
 
 Краткое описание файлов:
 
+В скрипте rag реализована основная часть пайплайна 
+
 В скрипте templates содержатся контексты для пользовательских промптов
 
 В скрипте examples лежат примеры для few-shot learning
