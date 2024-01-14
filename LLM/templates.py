@@ -24,13 +24,12 @@ We consider as click only impression with tag == 'fclick'
 """
 
 
-"""provide step by step solution"""
+basic_template = """Use the following pieces of context to answer the question at the end.
+    {context}
+    Question: {question}
+    Helpful Answer:"""
 
-with_context = """Answer the question based only on the following context:
-{context}
-
-Question: {question}
-"""
+step_by_step = """provide step by step solution"""
 
 
 """

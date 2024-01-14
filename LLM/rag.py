@@ -2,7 +2,7 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-from templates import data_description
+from templates import data_description, basic_template
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import CSVLoader
@@ -12,10 +12,7 @@ from langchain.chains import RetrievalQA
 from langchain.llms import GPT4All
 
 question = "What are the best times of day for ad clicks? List the top 5 hours by their click success rate"
-template = """Use the following pieces of context to answer the question at the end.
-    {context}
-    Question: {question}
-    Helpful Answer:"""
+
 
 
 def rag_pipeline(
@@ -23,7 +20,8 @@ def rag_pipeline(
         template: str,
         data_description_template: str = None,
         csv_file_path: str = None,
-        llm_path: str = "/Users/victorialokteva/LLMtesttask/models/mistral.gguf"
+        llm_path: str = "/Users/victorialokteva/LLMtesttask/models/mistral.gguf",
+        extra_template: str = None
 ):
     if csv_file_path is None:
         csv_file_path = "/Users/victorialokteva/LLMtesttask/data/dataset.csv"
@@ -51,6 +49,8 @@ def rag_pipeline(
     # добавим шаблон с описанием данных
     if data_description_template:
         template = data_description_template + template
+    if extra_template:
+        template = template + extra_template
     QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
 
 
@@ -77,7 +77,7 @@ def result_to_file(data, filename):
 
 if __name__ == "__main__":
     result = rag_pipeline(question,
-                          template,
+                          basic_template,
                           data_description)
 
 
