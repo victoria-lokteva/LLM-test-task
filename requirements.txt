@@ -11,3 +11,6 @@ numpy~=1.26.3
 joblib~=1.3.2
 optuna
 sentence-transformers
+langchain-community
+gpt4all
+faiss-cpu

@@ -1,12 +1,16 @@
-from langchain.embeddings import HuggingFaceEmbeddings
+import warnings
+warnings.filterwarnings("ignore")
+
+from templates import data_description
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain import HuggingFacePipeline
-from langchain.document_loaders import CSVLoader
-from langchain.vectorstores import FAISS
+from langchain_community.document_loaders import CSVLoader
+from langchain_community.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
-from langchain_community.llms import GPT4All
+from langchain.llms import GPT4All
 
 question = "What are the best times of day for ad clicks? List the top 5 hours by their click success rate"
 template = """Use the following pieces of context to answer the question at the end.
@@ -15,10 +19,15 @@ template = """Use the following pieces of context to answer the question at the 
     Helpful Answer:"""
 
 
-def rag_pipeline(question: str,
-                 template: str,
-                 csv_file_path: str = "/Users/victorialokteva/LLM-test-task/data/dataset.csv",
-                 ):
+def rag_pipeline(
+        question: str,
+        template: str,
+        data_description_template: str = None,
+        csv_file_path: str = None,
+):
+    if csv_file_path is None:
+        csv_file_path = "/Users/victorialokteva/LLM-test-task/data/dataset.csv"
+
     # прочтем csv файл с помощью langchain
     loader = CSVLoader(file_path=csv_file_path)
     data = loader.load()
@@ -39,16 +48,18 @@ def rag_pipeline(question: str,
     # используем векторное хранилище faiss
     db = FAISS.from_documents(docs, embeddings)
 
-    searchDocs = db.similarity_search(question)
+    # searchDocs = db.similarity_search(question)
 
+    if data_description_template:
+        template = data_description_template + template
     QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
 
-    model = GPT4All(model="./models/mistral-7b-openorca.Q4_0.gguf", n_threads=8)
+    model = GPT4All(model="../models/mistral-7b-openorca.Q4_0.gguf", n_threads=8)
+    # model = GPT4All(model="/models/mistral-7b-openorca.Q4_0.gguf", n_threads=8)
 
     # tokenizer = AutoTokenizer.from_pretrained("model/google/flan-t5-large")
-    tokenizer = AutoTokenizer.from_pretrained("./models/mistral-7b-openorca.Q4_0.gguf")
-    # model = AutoModelForSeq2SeqLM.from_pretrained("model/google/flan-t5-large")
-    pipe = pipeline("text2text-generation", model=model, tokenizer=tokenizer)
+    tokenizer = AutoTokenizer.from_pretrained("../models/mistral-7b-openorca.Q4_0.gguf")
+    # pipe = pipeline("text2text-generation", model=model, tokenizer=tokenizer)
     llm = HuggingFacePipeline(
         pipeline=pipeline,
         model_kwargs={"temperature": 0, "max_length": 512},
@@ -64,9 +75,14 @@ def rag_pipeline(question: str,
     print(result["result"])
     return result
 
-    ###############
+def result_to_file(data, filename):
+    with open(filename, "w", encoding="utf-8") as file:
+        file.write(data)
 
 
-if __name__ == 'main':
-    rag_pipeline(question,
-                 template)
+
+if __name__ == "__main__":
+    result = rag_pipeline(question,
+                          template,
+                          data_description)
+

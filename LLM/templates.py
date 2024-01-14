@@ -18,10 +18,11 @@ tag - impression type
 ########
 
 We consider as click only impression with tag == 'fclick'
+
+########
+
 """
 
-
-preprocess = """"""
 
 """provide step by step solution"""
 
@@ -32,7 +33,7 @@ Question: {question}
 """
 
 
-f"""
+"""
 Analyze provided dataset and answer the question:
  "{question}"
  
@@ -61,7 +62,7 @@ End interactions with "TERMINATE" after task completion.
 Available agents: [database structure analyzer, statistics generation, data visualization]. 
 Decompose the task and choose the most suitable agents from the available agents. Print ONLY a list where each element is: <number>###<Task description>###<the most suitable agent from the available agents>"""
 
-f"""Here is en example: {example}
+"""Here is en example: {example}
 Now solve this task {}
 """
 
