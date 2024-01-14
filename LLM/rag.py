@@ -1,7 +1,8 @@
 import warnings
+
 warnings.filterwarnings("ignore")
 
-from templates import data_description
+# from templates import data_description
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -26,7 +27,7 @@ def rag_pipeline(
         csv_file_path: str = None,
 ):
     if csv_file_path is None:
-        csv_file_path = "/Users/victorialokteva/LLM-test-task/data/dataset.csv"
+        csv_file_path = "/Users/victorialokteva/LLMtesttask/data/dataset.csv"
 
     # прочтем csv файл с помощью langchain
     loader = CSVLoader(file_path=csv_file_path)
@@ -48,21 +49,19 @@ def rag_pipeline(
     # используем векторное хранилище faiss
     db = FAISS.from_documents(docs, embeddings)
 
-    # searchDocs = db.similarity_search(question)
-
+    # добавим шаблон с описанием данных
     if data_description_template:
         template = data_description_template + template
     QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
 
-    model = GPT4All(model="../models/mistral-7b-openorca.Q4_0.gguf", n_threads=8)
-    # model = GPT4All(model="/models/mistral-7b-openorca.Q4_0.gguf", n_threads=8)
-
-    # tokenizer = AutoTokenizer.from_pretrained("model/google/flan-t5-large")
-    tokenizer = AutoTokenizer.from_pretrained("../models/mistral-7b-openorca.Q4_0.gguf")
-    # pipe = pipeline("text2text-generation", model=model, tokenizer=tokenizer)
+    model = GPT4All(model="/Users/victorialokteva/LLMtesttask/models/mistral.gguf", n_threads=8)
+    tokenizer = AutoTokenizer.from_pretrained("/Users/victorialokteva/LLMtesttask/models/mistral.gguf")
+    pipe = pipeline("text2text-generation", model=model, tokenizer=tokenizer)
+    # поставим temperature = 0, чтобы меньше искажать факты
     llm = HuggingFacePipeline(
-        pipeline=pipeline,
-        model_kwargs={"temperature": 0, "max_length": 512},
+        pipeline=pipe,
+        model_kwargs={"temperature": 0,
+                      "max_length": 512},
     )
 
     qa_chain = RetrievalQA.from_chain_type(
@@ -75,14 +74,20 @@ def rag_pipeline(
     print(result["result"])
     return result
 
+
 def result_to_file(data, filename):
     with open(filename, "w", encoding="utf-8") as file:
         file.write(data)
 
 
-
 if __name__ == "__main__":
+    # result = rag_pipeline(question,
+    #                       template,
+    #                       data_description)
     result = rag_pipeline(question,
-                          template,
-                          data_description)
+                          template
+                          )
 
+    output_file = f"../generated_code/{question[:14].txt}"
+
+    result_to_file(result["result"], output_file)
