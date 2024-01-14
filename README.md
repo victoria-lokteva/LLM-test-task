@@ -18,6 +18,8 @@ pip install gpt4all
 mkdir models
 
 wget https://gpt4all.io/models/gguf/mistral-7b-openorca.Q4_0.gguf -O models/mistral-7b-openorca.Q4_0.gguf
+
+mv models/mistral-7b-openorca.Q4_0.gguf models/mistral.gguf
 ```
 
 
