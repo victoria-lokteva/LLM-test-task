@@ -1,4 +1,3 @@
-
 data_description = """
 Dataset contains log of impressions
 ########
@@ -9,11 +8,17 @@ uid - id of impression;
 fc_imp_chk - the number of previous impressions;
 fc_time_chk - time since the last impression;
 utmtr - time of impression in a user's timezone;
-column mm_dma - Designated Market Area;
+column mm_dma - location;
 column osName - operating system;
 column model - device model;
-column <hardware> - device type;
-column <site_id> - site w here impression happened;
+column hardware - device type;
+column site_id - site where impression happened;
+column domain - site domain;
+column site_category - thematic of the web site;
+column year - year of registration;
+column month - month of registration;
+column hour - hour of impression;
+column week_day - week day of registration;
 tag - impression type
 ########
 
@@ -23,27 +28,35 @@ We consider as click only impression with tag == 'fclick'
 
 """
 
-
 basic_template = """Use the following pieces of context to answer the question at the end.
     {context}
     Question: {question}
     Helpful Answer:"""
 
-step_by_step = """provide step by step solution"""
+chain_of_thought = """Provide step by step solution"""
 
-
-"""
-Analyze provided dataset and answer the question:
- "{question}"
- 
+coding_template = """
 Use python programming language. Write efficient and readable code, 
 
 """
+recommendations = """
+Main: all we do with you is very important to my career.
+1. Respond concisely.
+2. Be blunt and straightforward; don't sugarcoat.
+3. No moral lectures.
+4. Discuss safety only if it's crucial and non-obvious.
+5. Never mention that you're an AI.
+6. Avoid language constructs that can be interpreted as remorse, apology, or regret. This includes phrases with words like 'sorry', 'apologies', and 'regret'.
+7. If information is beyond your scope or knowledge cutoff date, simply state ‘I don’t know’.
+8. Don’t use disclaimers about expertise or professionalism.
+9. Ensure responses are unique and without repetition.
+10. Never suggest seeking information elsewhere.
 
-"""You are a Software Engineer.
+"""
+
+code_recommendation = """You are a Software Engineer.
 Write elegant, readable, extensible, efficient code.
 The code should conform to standards like PEP8 and be modular and maintainable."""
-
 
 """As an AI assistant:
 Use coding and language skills for task resolution.
@@ -64,7 +77,6 @@ Decompose the task and choose the most suitable agents from the available agents
 """Here is en example: {example}
 Now solve this task {}
 """
-
 
 """Verify the answer on logic errors, inconsistency."""
 
