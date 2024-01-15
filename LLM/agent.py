@@ -1,5 +1,4 @@
 import warnings
-
 warnings.filterwarnings("ignore")
 
 from templates import data_description, basic_template, chain_of_thought, code_recommendation
@@ -13,7 +12,7 @@ from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema.output_parser import StrOutputParser
 
 
-class Agent():
+class Agent:
 
     def __init__(self, llm_path="/Users/victorialokteva/LLMtesttask/models/mistral.gguf"):
         self.llm_path = llm_path
@@ -68,10 +67,10 @@ class Agent():
 
     def csv_to_embeddings(self, csv_file_path):
 
-        # прочтем csv файл с помощью langchain
+        # read csv file using langchain
         loader = CSVLoader(file_path=csv_file_path)
         data = loader.load()
-        # разобъем документ на части
+        # split documents into chuncks
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
         docs = text_splitter.split_documents(data)
 
@@ -84,7 +83,7 @@ class Agent():
             model_kwargs=model_kwargs,
             encode_kwargs=encode_kwargs
         )
-        # используем векторное хранилище faiss
+        # use vector store faiss
         db = FAISS.from_documents(docs, embeddings)
         return db
 
