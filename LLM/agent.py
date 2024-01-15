@@ -20,7 +20,7 @@ class Agent:
     def __init__(self):
         self.llm_path = Config().llm_paths['mistral']
 
-    def get_response(self, question, prompt, csv_file_path: str = None):
+    def get_response(self, question: str, prompt: str, csv_file_path: str = None):
         if csv_file_path is None:
             csv_file_path = Config().data_paths['dataset']
 
@@ -48,7 +48,7 @@ class Agent:
                     extra_template: str = None,
                     use_chain_of_thought: bool = False,
                     examples: str = None,
-                    is_need_coding: bool = True):
+                    is_need_coding: bool = True) -> str:
         if is_need_coding:
             template = code_recommendation + template
 
