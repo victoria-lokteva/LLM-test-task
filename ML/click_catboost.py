@@ -99,7 +99,6 @@ class ClickCatBoost(CatBoost):
         return experiments
 
     def predict(self, new_data=None) -> pd.DataFrame:
-        """Predicts the outcomes of the football matches."""
 
         if new_data is None:
             new_data = pd.read_feather(self.test_path)

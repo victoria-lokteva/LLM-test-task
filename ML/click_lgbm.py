@@ -50,7 +50,8 @@ class ClickLGBM(LightGBM):
         y = train[self.target]
 
         train_set = lgb.Dataset(x, y, categorical_feature=self.cat_features)
-
+        #шаг для optuna - будем изменять количество фичей в доле фичей на разбиении на 1 фичу
+        # (иначе optuna перебирает вещественные числа)
         fraction_step = round((1 / len(self.features)) - 0.001, 4)
 
         def objective(trial):
@@ -87,7 +88,6 @@ class ClickLGBM(LightGBM):
         return experiments
 
     def predict(self, new_data=None) -> pd.DataFrame:
-        """Predicts the outcomes of the football matches."""
 
         if new_data is None:
             new_data = pd.read_feather(self.test_path)
