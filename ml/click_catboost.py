@@ -23,7 +23,7 @@ class ClickCatBoost(CatBoost):
         self.train_path = Config().data_paths['train']
         self.validation_path = Config().data_paths['validation']
 
-        self.model_path = Config().model_paths['cb']
+        self.model_path = Config().ml_paths['cb']
 
         self.features = ['fc_imp_chk',
                          'fc_time_chk',
@@ -55,7 +55,8 @@ class ClickCatBoost(CatBoost):
 
         def objective(trial):
             """boosting_type:
-            Ordered — Usually provides better quality on small datasets (< 50k), but it may be slower than the Plain scheme.
+            Ordered — Usually provides better quality on small datasets (< 50k),
+            but it may be slower than the Plain scheme.
             Plain — The classic gradient boosting scheme."""
 
             params = {

@@ -29,7 +29,7 @@ class DataPreprocessor(object):
 
         # values of DMA that occur less than 5 times will be grouped into one category
         rare_dma = [dma for dma, count in data['mm_dma'].value_counts().items() if count < 5]
-        # lightgbm лучше подавать положительные категориальные фичи, поэтому избавимся от -1
+        # negative values are deemed unacceptable for categorical features in LightGBM.
         data.loc[data['mm_dma'].isin(rare_dma), 'mm_dma'] = data['mm_dma'].max() + 1
 
         # union Windows users into one category, Symbian and Linux -> other

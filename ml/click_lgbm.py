@@ -38,7 +38,7 @@ class ClickLGBM(LightGBM):
         self.train_path = Config().data_paths['train']
         self.validation_path = Config().data_paths['validation']
 
-        self.model_path = Config().model_paths['lgbm']
+        self.model_path = Config().ml_paths['lgbm']
 
     def optuna_optimization(self, n_trials: int) -> pd.DataFrame:
         """"""
@@ -50,8 +50,7 @@ class ClickLGBM(LightGBM):
         y = train[self.target]
 
         train_set = lgb.Dataset(x, y, categorical_feature=self.cat_features)
-        #шаг для optuna - будем изменять количество фичей в доле фичей на разбиении на 1 фичу
-        # (иначе optuna перебирает вещественные числа)
+        # one step is one feature
         fraction_step = round((1 / len(self.features)) - 0.001, 4)
 
         def objective(trial):

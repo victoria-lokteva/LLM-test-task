@@ -1,25 +1,28 @@
 import warnings
-warnings.filterwarnings("ignore")
 
-from templates import data_description, basic_template, chain_of_thought, code_recommendation
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain.llms import GPT4All
+from langchain.prompts import PromptTemplate
+from langchain.schema.output_parser import StrOutputParser
+from langchain.schema.runnable import RunnablePassthrough
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import CSVLoader
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain.prompts import PromptTemplate
-from langchain.llms import GPT4All
-from langchain.schema.runnable import RunnablePassthrough
-from langchain.schema.output_parser import StrOutputParser
+
+from config.config import Config
+from templates import data_description, basic_template, chain_of_thought, code_recommendation
+
+warnings.filterwarnings("ignore")
 
 
 class Agent:
 
-    def __init__(self, llm_path="/Users/victorialokteva/LLMtesttask/models/mistral.gguf"):
-        self.llm_path = llm_path
+    def __init__(self):
+        self.llm_path = Config().llm_paths['mistral']
 
-    def get_response(self, prompt, csv_file_path: str = None):
+    def get_response(self, question, prompt, csv_file_path: str = None):
         if csv_file_path is None:
-            csv_file_path = "/Users/victorialokteva/LLMtesttask/data/dataset.csv"
+            csv_file_path = Config().data_paths['dataset']
 
         db = self.csv_to_embeddings(csv_file_path)
 
@@ -39,15 +42,14 @@ class Agent:
         result = rag_chain.invoke(question)
         return result
 
-    def edit_prompt(question: str,
-                    template: str,
+    @staticmethod
+    def edit_prompt(template: str,
                     data_description_template: str = None,
                     extra_template: str = None,
                     use_chain_of_thought: bool = False,
                     examples: str = None,
-                    need_cooding: bool = True
-                    ):
-        if need_cooding:
+                    is_need_coding: bool = True):
+        if is_need_coding:
             template = code_recommendation + template
 
         # add template with data description
@@ -65,19 +67,22 @@ class Agent:
         prompt_template = PromptTemplate.from_template(template)
         return prompt_template
 
-    def csv_to_embeddings(self, csv_file_path):
+    @staticmethod
+    def csv_to_embeddings(csv_file_path: str):
 
         # read csv file using langchain
         loader = CSVLoader(file_path=csv_file_path)
         data = loader.load()
-        # split documents into chuncks
+
+        # split documents into chunks
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
         docs = text_splitter.split_documents(data)
 
-        # части докумена превратим в эмбеддинги
+        # parts of the documents -> embeddings
         model_name = 'sentence-transformers/all-MiniLM-L6-v2'
         model_kwargs = {'device': 'cpu'}
         encode_kwargs = {'normalize_embeddings': False}
+
         embeddings = HuggingFaceEmbeddings(
             model_name=model_name,
             model_kwargs=model_kwargs,
@@ -94,13 +99,13 @@ def result_to_file(data, filename):
 
 
 if __name__ == "__main__":
-    question = """Which types of devices get the most ad clicks, ranked from highest to lowest"""
+    question_example = """Which types of devices get the most ad clicks, ranked from highest to lowest"""
 
     agent = Agent()
 
-    prompt = Agent.edit_prompt(question, basic_template,
+    prompt = Agent.edit_prompt(question_example, basic_template,
                                data_description, use_chain_of_thought=True)
 
-    result = Agent().get_response(prompt)
-    output_file = f"../generated_code/{question[:20]}.txt"
+    result = Agent().get_response(question_example, prompt)
+    output_file = f"../generated_code/{question_example[:20]}.txt"
     result_to_file(result, output_file)

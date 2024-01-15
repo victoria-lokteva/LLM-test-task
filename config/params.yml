@@ -1,9 +1,11 @@
 data_paths:
   x_data: "data/interview.X.csv"
   y_data: "data/interview.y.csv"
-  dataset: "data/dataset.csv"
+  dataset: "../data/dataset.csv"
   train: "data/train.feather"
   validation: "data/validation.feather"
-model_paths:
+ml_paths:
   lgbm: "saved_models/lgbm.pkl"
   cb: "saved_models/cb.pkl"
+llm_paths:
+  mistral: "../models/mistral.gguf"
