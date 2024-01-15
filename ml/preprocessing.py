@@ -27,7 +27,7 @@ class DataPreprocessor(object):
         for col in ['osName', 'model', 'hardware']:
             data.loc[data[col].isna(), col] = 'unknown'
 
-        # значения dma, которые встречаются менее 5 раз, объединим в одну категорию ("другое")
+        # values of DMA that occur less than 5 times will be grouped into one category
         rare_dma = [dma for dma, count in data['mm_dma'].value_counts().items() if count < 5]
         data.loc[data['mm_dma'].isin(rare_dma), 'mm_dma'] = data['mm_dma'].max() + 1
 
@@ -35,7 +35,7 @@ class DataPreprocessor(object):
         data['osName'] = np.where(data['osName'].isin({'Windows 10', 'Windows 7'}), 'Windows', data['osName'])
         data['osName'] = np.where(data['osName'].isin({'Symbian', 'Linux'}), 'other', data['osName'])
 
-        # Аналогично поступим с model, and osName
+        # similarly, we will group values of 'model' and 'osName'
         rare_model = [model for model, count in data['model'].value_counts().items() if count < 5]
         data.loc[data['model'].isin(rare_model), 'model'] = "other"
 
@@ -55,10 +55,10 @@ class DataPreprocessor(object):
 
         data['year'] = data['reg_time'].dt.year
         data['month'] = data['reg_time'].dt.month
+        data['week_day'] = pd.to_datetime(data['reg_time']).dt.day_name()
 
         # similar with utmtr
         data['hour'] = data['reg_time'].dt.hour
-        data['week_day'] = pd.to_datetime(data['reg_time']).dt.day_name()
 
         data = data.drop(columns='reg_time')
         return data
@@ -128,10 +128,14 @@ class DataPreprocessor(object):
         is_health_site = (data['site_id'].str.contains('health')
                           | data['site_id'].str.contains('medical'))
 
-        masks = [is_sport_site, is_travel_site, is_weather_site, is_game_site, is_music_site, is_cook_site,
-                 is_health_site]
+        is_news_site = (data['site_id'].str.contains('news')
+                        | data['site_id'].str.contains('post')
+                        | data['site_id'].str.contains('fox'))
 
-        values = ['sport', 'travel', 'weather', 'game', 'music', 'cooking', 'health']
+        masks = [is_sport_site, is_travel_site, is_weather_site, is_game_site, is_music_site, is_cook_site,
+                 is_health_site, is_news_site]
+
+        values = ['sport', 'travel', 'weather', 'game', 'music', 'cooking', 'health', 'news']
 
         data['site_category'] = np.select(masks, values, default='other')
 
