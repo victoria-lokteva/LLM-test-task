@@ -5,14 +5,10 @@ from config.config import Config
 
 class DataPreprocessor(object):
 
-    def __init__(self):
-        self.x_data = Config().data_paths['x_data']
-        self.y_data = Config().data_paths['y_data']
-
     def preprocessing(self) -> pd.DataFrame:
         """"""
-        train = pd.read_csv(self.x_data)
-        test = pd.read_csv(self.y_data)
+        train = pd.read_csv(Config().data_paths['x_data'])
+        test = pd.read_csv(Config().data_paths['y_data'])
 
         train = train.drop_duplicates('uid')
 
@@ -47,7 +43,7 @@ class DataPreprocessor(object):
         data = self._date_preprocessing(data)
         data = self._targets(data)
 
-        data.to_csv("data/dataset.csv")
+        data.to_csv(Config().data_paths['dataset'])
 
         return data
 

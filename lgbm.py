@@ -81,7 +81,8 @@ class LightGBM(object):
                               bagging_fraction=self.bagging_fraction,
                               bagging_freq=self.bagging_freq,
                               min_data_in_leaf=self.min_data_in_leaf,
-                              random_state=self.seed)
+                              random_state=self.seed,
+                              verbose=-1)
 
     def regression(self):
         """"""
@@ -96,7 +97,8 @@ class LightGBM(object):
                              bagging_fraction=self.bagging_fraction,
                              bagging_freq=self.bagging_freq,
                              min_data_in_leaf=self.min_data_in_leaf,
-                             random_state=self.seed)
+                             random_state=self.seed,
+                             verbose=-1)
 
     def classifier_cv_score(self, params: dict, train_set: Dataset, cat_features: list[str] = None) -> float:
         """"""
