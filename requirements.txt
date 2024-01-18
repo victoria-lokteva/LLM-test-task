@@ -16,5 +16,6 @@ sentence-transformers
 langchain-community
 gpt4all
 faiss-cpu
-
+matplotlib
+chromadb
 nltk~=3.8.1

@@ -1,0 +1,39 @@
+Here is a step by step solution to find out which types of devices get the most ad clicks, ranked from highest to lowest.
+
+Step 1: Import necessary libraries
+
+```python
+import pandas as pd
+```
+
+Step 2: Load the dataset
+
+```python
+df = pd.read_csv('data/dataset.csv')
+```
+
+Step 3: Filter out the rows where tag is 'fclick'
+
+```python
+df = df[df['tag'] == 'fclick']
+```
+
+Step 4: Count the number of clicks for each device type
+
+```python
+device_clicks = df['hardware'].value_counts()
+```
+
+Step 5: Sort the device types by the number of clicks in descending order
+
+```python
+device_clicks = device_clicks.sort_values(ascending=False)
+```
+
+Step 6: Print the device types ranked by the number of clicks
+
+```python
+print(device_clicks)
+```
+
+This code will print the types of devices ranked from the highest to the lowest number of ad clicks. The 'hardware' column in the dataset is assumed to represent the device type. If the device type is represented by a different column, replace 'hardware' with the appropriate column name.

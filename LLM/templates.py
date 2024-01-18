@@ -1,4 +1,28 @@
+
+task_description = """
+
+Given following context:
+
+{context}
+
+Write code to solve the following task
+######
+{question}
+
+In code use dataset path = "data/dataset.csv"
+
+######
+The dataset is preprocessed, all duplicates are deleted and missing values are handled
+
+You do not need to fit a model and change dataset. You should just provide code, that I can run locally
+
+
+"""
+
+
 data_description = """
+
+I have dataset "../data/dataset.csv"
 Dataset contains log of impressions
 ########
 Input data  description
@@ -31,12 +55,12 @@ We consider as click only impression with tag == 'fclick'
 basic_template = """Use the following pieces of context to answer the question at the end.
     {context}
     Question: {question}
-    Helpful Answer:"""
+    """
 
 chain_of_thought = """Provide step by step solution"""
 
 coding_template = """
-Use python programming language. Write efficient and readable code, 
+ Write efficient and readable python code to answer this question
 
 """
 recommendations = """

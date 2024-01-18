@@ -1,0 +1,59 @@
+Here is a step-by-step solution to build a model to predict ad click probabilities:
+
+Step 1: Import necessary libraries
+```python
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from lightgbm import LGBMClassifier
+from sklearn.metrics import log_loss
+import joblib
+```
+
+Step 2: Load the dataset
+```python
+df = pd.read_csv('data/dataset.csv')
+```
+
+Step 3: Preprocess the data
+```python
+# Convert 'click' column to binary
+df['click'] = df['click'].astype(int)
+
+# Convert 'tag' column to binary where 'fclick' is 1 and others are 0
+df['tag'] = df['tag'].apply(lambda x: 1 if x == 'fclick' else 0)
+
+# Label encode categorical features
+le = LabelEncoder()
+categorical_features = ['osName', 'model', 'hardware', 'site_id', 'domain', 'site_category', 'week_day']
+for feature in categorical_features:
+    df[feature] = le.fit_transform(df[feature])
+```
+
+Step 4: Split the data into training and testing sets
+```python
+features = ['fc_imp_chk', 'fc_time_chk', 'utmtr', 'mm_dma', 'osName', 'model', 'hardware', 'site_id', 'domain', 'site_category', 'year', 'month', 'hour', 'week_day']
+target = 'click'
+X = df[features]
+y = df[target]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+```
+
+Step 5: Train the model
+```python
+model = LGBMClassifier()
+model.fit(X_train, y_train, categorical_feature=categorical_features)
+```
+
+Step 6: Evaluate the model
+```python
+y_pred = model.predict_proba(X_test)[:, 1]
+print('LogLoss: ', log_loss(y_test, y_pred))
+```
+
+Step 7: Save the model
+```python
+joblib.dump(model, 'lgbm.pkl')
+```
+
+This code will train a LightGBM model to predict ad click probabilities based on the given features. The model is then evaluated using log loss and saved for future use.

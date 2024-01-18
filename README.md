@@ -41,4 +41,59 @@
 
 2) Использовать autogpt для автоматической декомпозиции задания в скрипте.
 
-3) Прописать хотя бы десяток примеров для few-shot learning.
+3) Сделать более качественные примеры для few-shot learning с использованием ООП.
+
+
+## Результаты
+
+
+Для промптов с написанием кода использовался Agent из agentGPT4
+
+При построении модели для предсказания клика LLM учла примеры и обучила LightGBM 
+(без примеров LLM выбирала логистическую регрессию)
+
+
+Ниже приводятся результаты запуска сгенерированного кода для нескольких промптов:
+
+### Which types of devices get the most ad clicks, ranked from highest to lowest
+
+(код в файле generated_code/Which types of devic.py)
+
+![img.png](img.png)
+
+Результат получается подсчитанным верно
+
+### Build a model to predict ad click probabilities
+
+
+(код в файле generated_code/Build a model to pre.py)
+
+LLM обучила модель lightgbm и получила лог лосс чуть лучше чем при ML решении. Однако код предложенный LLM использовал site id, что плохо влияет на обобщающую способность модели.
+В то время в моем коде эта фича не использовалась сознательно.
+
+Log Loss (LLM) = 0.4314
+Log Loss (ML) = 0.4338
+
+
+
+### аналитические опросы без кода 
+
+Использовался SimpleCSVAgent (LLM/csv_agent). Примеры сгенерированных ответов лежат в папке SimpleAgentCode
+
+Вот пример ответа на вопрос
+
+Which types of devices get the most ad clicks, ranked from highest to lowest
+
+The types of devices that get the most ad clicks, ranked from highest to lowest, are:
+
+1. Mobile Phone: 3661 clicks
+2. Desktop: 48 clicks
+3. Unknown: 34 clicks
+4. Media Player: 2 clicks
+5. Tablet: 2 clicks
+6. Mobile+Phone: 0 clicks
+
+Этот ответ совпадает с результатом запуска groupby
+
+
+

@@ -1,6 +1,0 @@
- The best times of day for ad clicks, based on the given data, are as follows:
-    1. Hour 23 (Friday) - Click Success Rate: 100%
-    2. Hour 18 (Saturday) - Click Success Rate: 100%
-    3. Hour 7 (Regular Time) - Click Success Rate: 50%
-    4. Hour 6 (Saturday) - Click Success Rate: 50%
-    5. Hour 21 (Saturday) - Click Success Rate: 50%

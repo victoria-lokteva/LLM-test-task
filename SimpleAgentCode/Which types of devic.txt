@@ -1,0 +1,8 @@
+The types of devices that get the most ad clicks, ranked from highest to lowest, are:
+
+1. Mobile Phone: 3661 clicks
+2. Desktop: 48 clicks
+3. Unknown: 34 clicks
+4. Media Player: 2 clicks
+5. Tablet: 2 clicks
+6. Mobile+Phone: 0 clicks
